@@ -94,6 +94,7 @@
     "express-http-proxy": "^1.6.3",
     "express-robots-txt": "^1.0.0",
     "file-replace-loader": "^1.4.0",
+    "isbot": "^3.6.5",
     "js-yaml": "^4.1.0",
     "lodash-es": "^4.17.21",
     "morgan": "^1.10.0",
@@ -223,11 +224,29 @@
       "@commitlint/config-conventional"
     ],
     "rules": {
-      "body-leading-blank": [2, "always"],
-      "body-max-line-length": [2, "always", 400],
-      "footer-leading-blank": [2, "always"],
-      "footer-max-line-length": [2, "always", 400],
-      "header-max-length": [2, "always", 200],
+      "body-leading-blank": [
+        2,
+        "always"
+      ],
+      "body-max-line-length": [
+        2,
+        "always",
+        400
+      ],
+      "footer-leading-blank": [
+        2,
+        "always"
+      ],
+      "footer-max-line-length": [
+        2,
+        "always",
+        400
+      ],
+      "header-max-length": [
+        2,
+        "always",
+        200
+      ],
       "type-enum": [
         2,
         "always",

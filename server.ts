@@ -17,6 +17,7 @@ import {
 import { ngExpressEngine } from '@nguniversal/express-engine';
 import { getDeployURLFromEnv, setDeployUrlInFile } from './src/ssr/deploy-url';
 import * as client from 'prom-client';
+import * as isbot from 'isbot';
 
 const collectDefaultMetrics = client.collectDefaultMetrics;
 
@@ -399,38 +400,46 @@ export function app() {
       baseHref = match[1].replace(/%25/g, '%').replace(/%2F/g, '/');
     }
 
-    res.render(
-      'index',
-      {
-        req,
-        res,
-        providers: [{ provide: APP_BASE_HREF, useValue: baseHref }],
-      },
-      (err, html) => {
-        if (html) {
-          let newHtml = html;
-          if (process.env.PROXY_ICM && req.get('host')) {
-            newHtml = newHtml.replace(
-              new RegExp(ICM_BASE_URL, 'g'),
-              process.env.PROXY_ICM.startsWith('http') ? process.env.PROXY_ICM : `${req.protocol}://${req.get('host')}`
-            );
-          }
-          newHtml = newHtml.replace(/<base href="[^>]*>/, `<base href="${baseHref}" />`);
-
-          newHtml = setDeployUrlInFile(DEPLOY_URL, req.originalUrl, newHtml);
-
-          res.status(res.statusCode).send(newHtml);
-        } else {
-          res.status(500).send(err.message);
+    const adaptIndexHtml = (err: Error, html: string) => {
+      if (html) {
+        let newHtml = html;
+        if (process.env.PROXY_ICM && req.get('host')) {
+          newHtml = newHtml.replace(
+            new RegExp(ICM_BASE_URL, 'g'),
+            process.env.PROXY_ICM.startsWith('http') ? process.env.PROXY_ICM : `${req.protocol}://${req.get('host')}`
+          );
         }
-        if (logging) {
-          console.log(`RES ${res.statusCode} ${req.originalUrl}`);
-          if (err) {
-            console.log(err);
-          }
+        newHtml = newHtml.replace(/<base href="[^>]*>/, `<base href="${baseHref}" />`);
+
+        newHtml = setDeployUrlInFile(DEPLOY_URL, req.originalUrl, newHtml);
+
+        res.status(res.statusCode).send(newHtml);
+      } else {
+        res.status(500).send(err.message);
+      }
+      if (logging) {
+        console.log(`RES ${res.statusCode} ${req.originalUrl}`);
+        if (err) {
+          console.log(err);
         }
       }
-    );
+    };
+
+    if (isbot(req.headers['user-agent'])) {
+      console.log('bot traffic');
+      res.render(
+        'index',
+        {
+          req,
+          res,
+          providers: [{ provide: APP_BASE_HREF, useValue: baseHref }],
+        },
+        adaptIndexHtml
+      );
+    } else {
+      console.log('browser traffic');
+      fs.readFile(join(BROWSER_FOLDER, `index.html`), { encoding: 'utf-8' }, adaptIndexHtml);
+    }
   };
 
   if (/^(on|1|true|yes)$/i.test(process.env.PROMETHEUS)) {
