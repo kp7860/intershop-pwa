@@ -4,8 +4,8 @@ import { DeviceType, ViewType } from 'ish-core/models/viewtype/viewtype.types';
 import { DataRetentionPolicy } from 'ish-core/utils/meta-reducers';
 import { MultiSiteLocaleMap } from 'ish-core/utils/multi-site/multi-site.service';
 
+import { SparqueConfig } from '../app/extensions/sparque/models/sparque-config/sparque-config.model';
 import { TactonConfig } from '../app/extensions/tacton/models/tacton-config/tacton-config.model';
-import { SparqueConfig } from 'ish-core/models/sparque/sparque-config.model';
 
 export interface Environment {
   /* INTERSHOP COMMERCE MANAGEMENT REST API CONFIGURATION */
@@ -47,6 +47,7 @@ export interface Environment {
     | 'tracking'
     | 'tacton'
     | 'maps'
+    | 'sparque'
   )[];
 
   /* ADDITIONAL FEATURE CONFIGURATIONS */
