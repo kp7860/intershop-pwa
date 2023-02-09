@@ -167,7 +167,7 @@ server {
         proxy_set_header Host $host;
         proxy_pass_request_body off;
         proxy_set_header Content-Length "";
-        proxy_pass https://pwa-ish-demo.test.intershop.com/INTERSHOP/rest/WFS/inSPIRED-inTRONICS_Business-Site/rest/personalization;
+        proxy_pass https://host.docker.internal:8443/INTERSHOP/rest/WFS/inSPIRED-inTRONICS_Business-Site/rest/personalization;
     }
 
 
