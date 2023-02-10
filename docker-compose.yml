@@ -112,3 +112,6 @@ services:
     # hostname: 'your-local-host-name-with-fqdn'
     # volumes:
     #  - /home/your-user/ca-dir:/root/.local/share/mkcert
+networks:
+  default:
+    name: a-responsive-network
