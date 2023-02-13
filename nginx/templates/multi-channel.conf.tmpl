@@ -147,47 +147,9 @@ server {
         proxy_busy_buffers_size 256k;
     }
 
-    # handle sparque search
-    location /search {
-        allow all;
-
-        rewrite /search(/.*) $1 break;
-        proxy_pass https://rest.spinque.com:443;
-
-        proxy_set_header Host rest.spinque.com;
-        proxy_ssl_name        rest.spinque.com;
-
-        add_header X-debug-message "apiToken: $http_authentication_token" always;
-        access_log /var/log/nginx/access.log upstreamlog;
-    }
-
-    # handle sparque auth search
-    location ~ ^/search.*userId.*/ {
-        allow all;
-
-        auth_request /auth;
-
-        rewrite /search(/.*) $1 break;
-        proxy_pass https://rest.spinque.com:443;
-
-        proxy_set_header Host rest.spinque.com;
-        proxy_ssl_name        rest.spinque.com;
-
-        add_header X-debug-message "Auth check called: $http_authentication_token" always;
-        access_log /var/log/nginx/access.log upstreamlog;
-    }
-
-    location /auth {
-        internal;
-        proxy_set_header Host $host;
-        proxy_pass_request_body off;
-        proxy_set_header Content-Length "";
-
-        proxy_set_header authentication-token $http_authentication_token;
-        proxy_pass https://host.docker.internal:8443/INTERSHOP/rest/WFS/inSPIRED-inTRONICS_Business-Site/rest/personalization;
-        access_log /var/log/nginx/access.log upstreamlog;
-    }
-
+    {{ if getenv "HOST_SPARQUE" }}
+    include /etc/nginx/conf.d/search.conf;
+    {{ end }}
 
     # respect cache entries of static assets
     location ~* ^/(?!ngsw\.json)(metrics|assets|.*\.(js|css|json|txt|webmanifest|woff|woff2))(.*)$ {

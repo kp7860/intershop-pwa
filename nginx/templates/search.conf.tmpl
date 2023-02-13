@@ -1,0 +1,42 @@
+{{ $HOST_SPARQUE := getenv "HOST_SPARQUE" }}
+    # handle sparque search
+    location /search {
+        allow all;
+
+        rewrite /search(/.*) $1 break;
+        proxy_pass https://{{ $HOST_SPARQUE }}:443;
+
+        proxy_set_header Host {{ $HOST_SPARQUE }};
+        proxy_ssl_name        {{ $HOST_SPARQUE }};
+
+        add_header X-debug-message "No auth search call." always;
+        access_log /var/log/nginx/access.log upstreamlog;
+    }
+
+    # handle sparque auth search
+    location ~ ^/search.*userId.*/ {
+        allow all;
+
+        auth_request /auth;
+
+        rewrite /search(/.*) $1 break;
+        proxy_pass https://{{ $HOST_SPARQUE }};
+
+        proxy_set_header Host {{ $HOST_SPARQUE }};
+        proxy_ssl_name        {{ $HOST_SPARQUE }};
+
+        add_header X-debug-message "Auth search call." always;
+        access_log /var/log/nginx/access.log upstreamlog;
+    }
+
+    # do the auth check against icm
+    location /auth {
+        internal;
+        proxy_set_header Host $host;
+        proxy_pass_request_body off;
+        proxy_set_header Content-Length "";
+
+        proxy_set_header authentication-token $http_authentication_token;
+        proxy_pass {{ getenv "UPSTREAM_AUTH_CHECK" }};
+        access_log /var/log/nginx/access.log upstreamlog;
+    }
