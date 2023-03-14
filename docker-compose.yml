@@ -64,8 +64,6 @@ services:
       # - '9113:9113'
     environment:
       UPSTREAM_PWA: 'http://pwa:4200'
-      HOST_SPARQUE: 'rest.spinque.com'
-      UPSTREAM_AUTH_CHECK: 'https://host.docker.internal:8443/INTERSHOP/rest/WFS/inSPIRED-inTRONICS_Business-Site/rest/personalization'
       DEBUG: 0
       NGINX_ENTRYPOINT_QUIET_LOGS: ANYVALUE
       CACHE: 0

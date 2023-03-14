@@ -43,7 +43,7 @@ export class SparqueApiService {
    */
   get<T>(path: string): Observable<T> {
     let authtoken: string;
-    this.apiTokenService.apiToken$.subscribe(value => (authtoken = value));
+    this.apiTokenService.apiToken$.subscribe(value => (authtoken = `bearer ${value}`));
     return this.store.pipe(
       select(getSparqueConfigEndpoint),
 //      log('@Dori: Hier ist dein SPARQUE Endpoint:'),
@@ -54,7 +54,7 @@ export class SparqueApiService {
       concatMap(sparqueUrl =>
         this.httpClient.get<T>(`${sparqueUrl}/${path.replace('//', '/')}`, {
           headers: new HttpHeaders({
-            'authentication-token': authtoken,
+            'Authorization': authtoken,
           }),
         })
       )
