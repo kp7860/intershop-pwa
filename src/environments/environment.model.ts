@@ -152,7 +152,7 @@ export const ENVIRONMENT_DEFAULTS: Omit<Environment, 'icmChannel'> = {
   matomoSiteId: '2',
 
   /* FEATURE TOGGLES */
-  features: ['compare', 'contactUs', 'rating', 'recently', 'storeLocator'],
+  features: ['compare', 'contactUs', 'rating', 'recently', 'storeLocator', 'matomo'],
 
   /* PROGRESSIVE WEB APP CONFIGURATIONS */
   smallBreakpointWidth: 576,
