@@ -17,6 +17,7 @@ import { QuickorderExportsModule } from '../extensions/quickorder/exports/quicko
 import { SentryExportsModule } from '../extensions/sentry/exports/sentry-exports.module';
 import { SeoExportsModule } from '../extensions/seo/exports/seo-exports.module';
 import { StoreLocatorExportsModule } from '../extensions/store-locator/exports/store-locator-exports.module';
+import { MatomoExportsModule } from '../extensions/tracking/exports/matomo-exports.module';
 import { TrackingExportsModule } from '../extensions/tracking/exports/tracking-exports.module';
 import { WishlistsExportsModule } from '../extensions/wishlists/exports/wishlists-exports.module';
 
@@ -48,6 +49,7 @@ const exportedComponents = [CookiesBannerComponent, FooterComponent, HeaderCompo
     DirectivesModule,
     FeatureToggleModule,
     IconModule,
+    MatomoExportsModule,
     NgbCollapseModule,
     NgbDropdownModule,
     PipesModule,
