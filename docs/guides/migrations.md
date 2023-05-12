@@ -14,6 +14,13 @@ The Intershop PWA now uses Node.js 18.16.0 LTS with the corresponding npm versio
 As a leftover adaption regarding the switch from deprecated class-based route guards in favor of functional guards the `addGlobalGuard` function was adapted to actually work with functional guards.
 If the `addGlobalGuard` function is used for customizations make sure it now works as expected.
 
+A new `TokenService` is introduced to be only responsible for fetching token data from the ICM.
+However all necessary adaptions for the identity providers and the `fetchToken()` method of the UserService are removed in order to be completely independent of `TokenService`.
+If your identity providers should use the `OAuthService` to handle the authentication, please make sure to instantiate a new `OAuthService` entity within the identity provider.
+The `getOAuthServiceInstance()` static method from the `InstanceCreators` class can be used for that.
+Furthermore the handling of the anonymous user token has been changed.
+It will only be fetched when an anonymous user intends to create a basket.
+
 ## 3.3 to 4.0
 
 The Intershop PWA now uses Node.js 18.15.0 LTS with the corresponding npm version 9.5.0 and the `"lockfileVersion": 3,`.
