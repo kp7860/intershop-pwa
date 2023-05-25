@@ -6,7 +6,13 @@
   ngbDropdown
   placement="{{ placement === 'up' ? 'top-right' : 'bottom-right' }}"
 >
-  <button ngbDropdownToggle class="language-switch-button btn btn-link" aria-expanded="false" aria-haspopup="menu">
+  <button
+    ngbDropdownToggle
+    class="language-switch-button btn btn-link"
+    aria-expanded="false"
+    aria-haspopup="menu"
+    [attr.aria-label]="'locale.' + locale + '.long' | translate"
+  >
     <fa-icon [icon]="['fas', 'globe-americas']" class="header-icon"></fa-icon>
     <span class="language-switch-current-selection d-inline"
       >{{ 'locale.' + locale + (view === 'accordion' ? '.long' : '.short') | translate
