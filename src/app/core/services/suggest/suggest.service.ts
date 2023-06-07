@@ -1,10 +1,10 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { SparqueApiService } from 'src/app/extensions/sparque/services/sparque-api/sparque-api.service';
 
 import { SuggestTerm } from 'ish-core/models/suggest-term/suggest-term.model';
 import { ApiService, unpackEnvelope } from 'ish-core/services/api/api.service';
+import { SparqueApiService } from 'ish-core/services/sparque-api/sparque-api.service';
 import { FeatureToggleService } from 'ish-core/utils/feature-toggle/feature-toggle.service';
 
 /**

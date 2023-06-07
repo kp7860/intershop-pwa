@@ -6,8 +6,7 @@ import {
   SparqueFacetOptionsResponse,
   SparqueFacetResponse,
   SparqueOptionsResponse,
-} from 'src/app/extensions/sparque/models/sparque/sparque.interface';
-import { DEFINED_FACETS, SparqueApiService } from 'src/app/extensions/sparque/services/sparque-api/sparque-api.service';
+} from 'ish-core/models/sparque/sparque.interface';
 
 import { CategoryHelper } from 'ish-core/models/category/category.model';
 import { FilterNavigationData } from 'ish-core/models/filter-navigation/filter-navigation.interface';
@@ -15,6 +14,7 @@ import { FilterNavigationMapper } from 'ish-core/models/filter-navigation/filter
 import { FilterNavigation } from 'ish-core/models/filter-navigation/filter-navigation.model';
 import { Filter } from 'ish-core/models/filter/filter.model';
 import { ApiService } from 'ish-core/services/api/api.service';
+import { DEFINED_FACETS, SparqueApiService } from 'ish-core/services/sparque-api/sparque-api.service';
 import { FeatureToggleService } from 'ish-core/utils/feature-toggle/feature-toggle.service';
 import { omit } from 'ish-core/utils/functions';
 import { URLFormParams, appendFormParamsToHttpParams } from 'ish-core/utils/url-form-params';
