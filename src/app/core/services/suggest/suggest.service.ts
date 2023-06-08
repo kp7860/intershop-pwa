@@ -2,16 +2,17 @@ import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 
+import { SuggestServiceClass } from 'ish-core/models/suggest-service/suggest-service.interface';
 import { SuggestTerm } from 'ish-core/models/suggest-term/suggest-term.model';
 import { ApiService, unpackEnvelope } from 'ish-core/services/api/api.service';
-import { SparqueApiService } from 'ish-core/services/sparque-api/sparque-api.service';
+import { SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
 import { FeatureToggleService } from 'ish-core/utils/feature-toggle/feature-toggle.service';
 
 /**
  * The Suggest Service handles the interaction with the 'suggest' REST API.
  */
 @Injectable({ providedIn: 'root' })
-export class SuggestService {
+export class SuggestService implements SuggestServiceClass {
   constructor(
     private apiService: ApiService,
     private featureToggle: FeatureToggleService,
