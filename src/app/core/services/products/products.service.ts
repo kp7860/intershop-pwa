@@ -10,7 +10,6 @@ import { CategoryHelper } from 'ish-core/models/category/category.model';
 import { Link } from 'ish-core/models/link/link.model';
 import { ProductLinksDictionary } from 'ish-core/models/product-links/product-links.model';
 import { SortableAttributesType } from 'ish-core/models/product-listing/product-listing.model';
-import { ProductServiceClass } from 'ish-core/models/product-service/product-service.interface';
 import { ProductData, ProductDataStub, ProductVariationLink } from 'ish-core/models/product/product.interface';
 import { ProductMapper } from 'ish-core/models/product/product.mapper';
 import {
@@ -31,7 +30,7 @@ import STUB_ATTRS from './products-list-attributes';
  * The Products Service handles the interaction with the 'products' REST API.
  */
 @Injectable({ providedIn: 'root' })
-export class ProductsService implements ProductServiceClass {
+export class ProductsService {
   constructor(private apiService: ApiService, private productMapper: ProductMapper, private appFacade: AppFacade) {}
 
   /**

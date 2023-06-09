@@ -7,13 +7,18 @@ import { CategoryHelper } from 'ish-core/models/category/category.model';
 import { FilterNavigationData } from 'ish-core/models/filter-navigation/filter-navigation.interface';
 import { FilterNavigationMapper } from 'ish-core/models/filter-navigation/filter-navigation.mapper';
 import { FilterNavigation } from 'ish-core/models/filter-navigation/filter-navigation.model';
-import { FilterServiceClass } from 'ish-core/models/filter-service/filter-service.interface';
 import { ApiService } from 'ish-core/services/api/api.service';
 import { omit } from 'ish-core/utils/functions';
 import { URLFormParams, appendFormParamsToHttpParams } from 'ish-core/utils/url-form-params';
 
+export interface BaseFilterService {
+  getFilterForCategory(categoryUniqueId: string): Observable<FilterNavigation>;
+  getFilterForSearch(searchTerm: string): Observable<FilterNavigation>;
+  getFilterForMaster(masterSKU: string): Observable<FilterNavigation>;
+  applyFilter(searchParameter: URLFormParams): Observable<FilterNavigation>;
+}
 @Injectable({ providedIn: 'root' })
-export class FilterService implements FilterServiceClass {
+export class FilterService implements BaseFilterService {
   constructor(private apiService: ApiService, private filterNavigationMapper: FilterNavigationMapper) {}
 
   getFilterForCategory(categoryUniqueId: string): Observable<FilterNavigation> {

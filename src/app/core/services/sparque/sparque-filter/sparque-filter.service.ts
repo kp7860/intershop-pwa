@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
 
 import { FilterNavigation } from 'ish-core/models/filter-navigation/filter-navigation.model';
-import { FilterServiceClass } from 'ish-core/models/filter-service/filter-service.interface';
 import { Filter } from 'ish-core/models/filter/filter.model';
 import {
   SparqueFacetOptionsResponse,
   SparqueFacetResponse,
   SparqueOptionsResponse,
 } from 'ish-core/models/sparque/sparque.interface';
+import { BaseFilterService } from 'ish-core/services/filter/filter.service';
 import { DEFINED_FACETS, SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
 import { URLFormParams } from 'ish-core/utils/url-form-params';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueFilterService implements Partial<FilterServiceClass> {
+export class SparqueFilterService implements Partial<BaseFilterService> {
   constructor(private sparqueApiService: SparqueApiService) {}
 
   getFilterForSearch(searchTerm: string): Observable<FilterNavigation> {
