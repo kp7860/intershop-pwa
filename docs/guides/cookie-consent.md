@@ -33,7 +33,7 @@ cookieConsentOptions: {
       description: 'cookie.consent.option.tracking.description',
     },
   },
-  allowedCookies: ['cookieConsent', 'apiToken'],
+  allowedCookies: ['apiToken', 'cookieConsent', 'preferredLocale'],
 },
 ```
 
@@ -42,7 +42,7 @@ The `options` array configures the presented options in the _Cookie Preferences_
 - The option `id` is the value that will be stored in the user's `cookieConsent` settings.
 - The `name` makes up the checkbox label name, usually given as localization key.
 - The `description` contains the additional option description, usually given as localization key.
-- With the `required` flag, an option can be marked as not deselectable.
+- With the `required` flag, an option can be marked as not non-selectable.
   In this way, the user can be informed that necessary cookies are always set without explicit consent of the user.
 
 The following screenshot is the rendered representation of the default cookie consent options configuration:
