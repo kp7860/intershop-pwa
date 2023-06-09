@@ -9,20 +9,12 @@ import { FilterNavigationMapper } from 'ish-core/models/filter-navigation/filter
 import { FilterNavigation } from 'ish-core/models/filter-navigation/filter-navigation.model';
 import { FilterServiceClass } from 'ish-core/models/filter-service/filter-service.interface';
 import { ApiService } from 'ish-core/services/api/api.service';
-import { SparqueFilterService } from 'ish-core/services/sparque/sparque-filter/sparque-filter.service';
-import { FeatureToggleService } from 'ish-core/utils/feature-toggle/feature-toggle.service';
 import { omit } from 'ish-core/utils/functions';
 import { URLFormParams, appendFormParamsToHttpParams } from 'ish-core/utils/url-form-params';
 
-//import e = require('express');
 @Injectable({ providedIn: 'root' })
 export class FilterService implements FilterServiceClass {
-  constructor(
-    private apiService: ApiService,
-    private filterNavigationMapper: FilterNavigationMapper,
-    private featureToggle: FeatureToggleService,
-    private sparqueFilterService: SparqueFilterService
-  ) {}
+  constructor(private apiService: ApiService, private filterNavigationMapper: FilterNavigationMapper) {}
 
   getFilterForCategory(categoryUniqueId: string): Observable<FilterNavigation> {
     const category = CategoryHelper.getCategoryPath(categoryUniqueId);
@@ -32,16 +24,12 @@ export class FilterService implements FilterServiceClass {
   }
 
   getFilterForSearch(searchTerm: string): Observable<FilterNavigation> {
-    if (this.featureToggle.enabled('sparque')) {
-      return this.sparqueFilterService.getFilterForSearch(searchTerm);
-    } else {
-      return this.apiService
-        .get<FilterNavigationData>(`productfilters`, {
-          sendSPGID: true,
-          params: new HttpParams().set('searchTerm', searchTerm),
-        })
-        .pipe(map(filter => this.filterNavigationMapper.fromData(filter)));
-    }
+    return this.apiService
+      .get<FilterNavigationData>(`productfilters`, {
+        sendSPGID: true,
+        params: new HttpParams().set('searchTerm', searchTerm),
+      })
+      .pipe(map(filter => this.filterNavigationMapper.fromData(filter)));
   }
 
   getFilterForMaster(masterSKU: string): Observable<FilterNavigation> {
@@ -54,18 +42,14 @@ export class FilterService implements FilterServiceClass {
   }
 
   applyFilter(searchParameter: URLFormParams): Observable<FilterNavigation> {
-    if (this.featureToggle.enabled('sparque')) {
-      return this.sparqueFilterService.applyFilter(searchParameter);
-    } else {
-      const params = appendFormParamsToHttpParams(omit(searchParameter, 'category'));
+    const params = appendFormParamsToHttpParams(omit(searchParameter, 'category'));
 
-      const resource = searchParameter.category
-        ? `categories/${searchParameter.category[0]}/productfilters`
-        : 'productfilters';
+    const resource = searchParameter.category
+      ? `categories/${searchParameter.category[0]}/productfilters`
+      : 'productfilters';
 
-      return this.apiService
-        .get<FilterNavigationData>(resource, { params })
-        .pipe(map(filter => this.filterNavigationMapper.fromData(filter)));
-    }
+    return this.apiService
+      .get<FilterNavigationData>(resource, { params })
+      .pipe(map(filter => this.filterNavigationMapper.fromData(filter)));
   }
 }

@@ -1,11 +1,10 @@
 import { HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { flatten, range } from 'lodash-es';
-import { Observable, OperatorFunction, forkJoin, from, identity, iif, of, throwError } from 'rxjs';
-import { catchError, defaultIfEmpty, map, mergeMap, switchMap, toArray, withLatestFrom } from 'rxjs/operators';
+import { Observable, OperatorFunction, from, identity, of, throwError } from 'rxjs';
+import { defaultIfEmpty, map, mergeMap, switchMap, toArray, withLatestFrom } from 'rxjs/operators';
 
 import { AppFacade } from 'ish-core/facades/app.facade';
-import { FeatureToggleService } from 'ish-core/feature-toggle.module';
 import { AttributeGroupTypes } from 'ish-core/models/attribute-group/attribute-group.types';
 import { CategoryHelper } from 'ish-core/models/category/category.model';
 import { Link } from 'ish-core/models/link/link.model';
@@ -22,7 +21,6 @@ import {
   VariationProductMaster,
 } from 'ish-core/models/product/product.model';
 import { ApiService, unpackEnvelope } from 'ish-core/services/api/api.service';
-import { SparqueProductService } from 'ish-core/services/sparque/sparque-product/sparque-product.service';
 import { omit } from 'ish-core/utils/functions';
 import { mapToProperty } from 'ish-core/utils/operators';
 import { URLFormParams, appendFormParamsToHttpParams } from 'ish-core/utils/url-form-params';
@@ -34,13 +32,7 @@ import STUB_ATTRS from './products-list-attributes';
  */
 @Injectable({ providedIn: 'root' })
 export class ProductsService implements ProductServiceClass {
-  constructor(
-    private apiService: ApiService,
-    private productMapper: ProductMapper,
-    private appFacade: AppFacade,
-    private featureToggle: FeatureToggleService,
-    private sparqueProductService: SparqueProductService
-  ) {}
+  constructor(private apiService: ApiService, private productMapper: ProductMapper, private appFacade: AppFacade) {}
 
   /**
    * Get the full Product data for the given Product SKU.
@@ -129,25 +121,6 @@ export class ProductsService implements ProductServiceClass {
   ): Observable<{ products: Product[]; sortableAttributes: SortableAttributesType[]; total: number }> {
     if (!searchTerm) {
       return throwError(() => new Error('searchProducts() called without searchTerm'));
-    }
-
-    if (this.featureToggle.enabled('sparque')) {
-      // TODO Sparque API should provide all necessary product information
-      return this.sparqueProductService.searchProductKeys(searchTerm, amount, offset).pipe(
-        switchMap(({ skus, sortableAttributes, total }) =>
-          iif(
-            () => !!total,
-            forkJoin(skus.map(sku => this.getProduct(sku).pipe(catchError(() => of(undefined))))),
-            of([])
-          ).pipe(
-            map(products => ({
-              products: products.filter(p => !!p),
-              sortableAttributes,
-              total,
-            }))
-          )
-        )
-      );
     }
 
     let params = new HttpParams()
