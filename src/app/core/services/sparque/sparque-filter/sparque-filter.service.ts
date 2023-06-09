@@ -49,7 +49,7 @@ export class SparqueFilterService implements Partial<BaseFilterService> {
               locale,
               userId,
               basketSKUs
-            )}${appliedFilterPath}/options/${facet}`
+            )}${appliedFilterPath}/options/${facet}?config=default`
           )
           .pipe(
             map(
@@ -76,8 +76,8 @@ export class SparqueFilterService implements Partial<BaseFilterService> {
 
                     return {
                       name: id,
-                      displayName: opt.title,
-                      count: opt.score,
+                      displayName: opt.value,
+                      count: parseInt(opt.title),
                       level: 0,
                       selected,
                       searchParameter: {

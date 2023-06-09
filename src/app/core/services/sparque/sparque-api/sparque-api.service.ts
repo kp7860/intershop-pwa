@@ -29,7 +29,7 @@ export class SparqueApiService {
     const basketSKUsPath = basketSKUs?.length
       ? `p/cartId/${basketSKUs.reduce((prev, curr, idx) => `${prev}${idx ? '|' : ''}1(${curr})`, '') ?? '1()'}`
       : '';
-    return `c/locale/${locale ?? 'en-US'}/e/search${userId ? `/p/userId/${userId}` : ''}/p/keyword/${encodeURIComponent(
+    return `${userId ? `c/userId/${userId}/` : ''}c/locale/${locale ?? 'en-US'}/e/search/p/keyword/${encodeURIComponent(
       searchTerm
     )}/${basketSKUsPath}`;
   }
@@ -42,7 +42,7 @@ export class SparqueApiService {
           ? `e/${encodeURIComponent(key)}:FILTER/p/value/1(${encodeURIComponent(searchParameter[key][0])})`
           : `e/facet_filter/p/attribute/${key}/p/value/1(${encodeURI(searchParameter[key][0])})`
       )
-      .reduce((prev, curr, idx, arr) => prev.concat(curr, idx !== arr.length - 1 ? '/' : ''), '/');
+      .reduce((prev, curr, idx, arr) => prev.concat(curr, idx !== arr.length - 1 ? '/' : ''), '');
   }
 
   /**
