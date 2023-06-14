@@ -16,8 +16,18 @@ export interface ServiceSelection {
   serviceName: keyof Services;
   selectClass(): any;
 }
+
 export const SERVICE_SELECTION_CONFIG = new InjectionToken<ServiceSelection>('serviceSelectionConfig');
 
+export function generateServiceSelectionConfig<T extends keyof Services, R extends ReturnTypeFromKey<Services, T>>(
+  serviceName: T,
+  selectClass: () => R
+): ServiceSelection {
+  return {
+    serviceName,
+    selectClass,
+  };
+}
 @Injectable({ providedIn: 'root' })
 export class ServiceSelectService {
   private injector = inject(Injector);
