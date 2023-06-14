@@ -4,16 +4,16 @@ import { BaseFilterService } from 'ish-core/services/filter/filter.service';
 import { BaseProductsService } from 'ish-core/services/products/products.service';
 import { BaseSuggestService } from 'ish-core/services/suggest/suggest.service';
 
-export type ServiceType = 'suggest' | 'filter' | 'products';
+interface Services {
+  suggest: BaseSuggestService;
+  filter: BaseFilterService;
+  products: BaseProductsService;
+}
 
-export type ServiceClass<T extends ServiceType> = T extends 'suggest'
-  ? BaseSuggestService
-  : T extends 'filter'
-  ? BaseFilterService
-  : BaseProductsService;
+type ReturnTypeFromKey<T, K extends keyof T> = T[K];
 
 export interface ServiceSelection {
-  serviceName: ServiceType;
+  serviceName: keyof Services;
   selectClass(): any;
 }
 export const SERVICE_SELECTION_CONFIG = new InjectionToken<ServiceSelection>('serviceSelectionConfig');
@@ -22,7 +22,7 @@ export const SERVICE_SELECTION_CONFIG = new InjectionToken<ServiceSelection>('se
 export class ServiceSelectService {
   private injector = inject(Injector);
 
-  get<T extends ServiceType, R extends ServiceClass<T>>(service: T): R {
+  get<T extends keyof Services, R extends ReturnTypeFromKey<Services, T>>(service: T): R {
     return this.injector
       .get<ServiceSelection[]>(SERVICE_SELECTION_CONFIG, [])
       .find(config => config.serviceName === service)
