@@ -22,7 +22,6 @@ import {
 import { ProductListingMapper } from 'ish-core/models/product-listing/product-listing.mapper';
 import { Product, ProductHelper } from 'ish-core/models/product/product.model';
 import { ofProductUrl } from 'ish-core/routing/product/product.route';
-import { ProductsService } from 'ish-core/services/products/products.service';
 import { selectRouteParam } from 'ish-core/store/core/router';
 import { setBreadcrumbData } from 'ish-core/store/core/viewconf';
 import { personalizationStatusDetermined } from 'ish-core/store/customer/user';
@@ -38,6 +37,7 @@ import {
   mapToProperty,
   whenTruthy,
 } from 'ish-core/utils/operators';
+import { ServiceSelectService } from 'ish-core/utils/service-select/service-select.service';
 
 import {
   loadProduct,
@@ -71,10 +71,10 @@ export class ProductsEffects {
   constructor(
     private actions$: Actions,
     private store: Store,
-    private productsService: ProductsService,
     private httpStatusCodeService: HttpStatusCodeService,
     private productListingMapper: ProductListingMapper,
-    private router: Router
+    private router: Router,
+    private serviceSelect: ServiceSelectService
   ) {}
 
   loadProduct$ = createEffect(() =>
@@ -87,10 +87,13 @@ export class ProductsEffects {
         group$.pipe(
           this.throttleOnBrowser(),
           switchMap(sku =>
-            this.productsService.getProduct(sku).pipe(
-              map(product => loadProductSuccess({ product })),
-              mapErrorToAction(loadProductFail, { sku })
-            )
+            this.serviceSelect
+              .get('products')
+              .getProduct(sku)
+              .pipe(
+                map(product => loadProductSuccess({ product })),
+                mapErrorToAction(loadProductFail, { sku })
+              )
           )
         )
       )
@@ -118,26 +121,29 @@ export class ProductsEffects {
       withLatestFrom(this.store.pipe(select(getProductListingItemsPerPage('category')))),
       map(([payload, pageSize]) => ({ ...payload, amount: pageSize, offset: (payload.page - 1) * pageSize })),
       concatMap(({ categoryId, amount, sorting, offset, page }) =>
-        this.productsService.getCategoryProducts(categoryId, amount, sorting, offset).pipe(
-          concatMap(({ total, products, sortableAttributes }) => [
-            ...products.map(product => loadProductSuccess({ product })),
-            setProductListingPages(
-              this.productListingMapper.createPages(
-                products.map(p => p.sku),
-                'category',
-                categoryId,
-                amount,
-                {
-                  startPage: page,
-                  sortableAttributes,
-                  sorting,
-                  itemCount: total,
-                }
-              )
-            ),
-          ]),
-          mapErrorToAction(loadProductsForCategoryFail, { categoryId })
-        )
+        this.serviceSelect
+          .get('products')
+          .getCategoryProducts(categoryId, amount, sorting, offset)
+          .pipe(
+            concatMap(({ total, products, sortableAttributes }) => [
+              ...products.map(product => loadProductSuccess({ product })),
+              setProductListingPages(
+                this.productListingMapper.createPages(
+                  products.map(p => p.sku),
+                  'category',
+                  categoryId,
+                  amount,
+                  {
+                    startPage: page,
+                    sortableAttributes,
+                    sorting,
+                    itemCount: total,
+                  }
+                )
+              ),
+            ]),
+            mapErrorToAction(loadProductsForCategoryFail, { categoryId })
+          )
       )
     )
   );
@@ -154,26 +160,29 @@ export class ProductsEffects {
       map(([payload, pageSize]) => ({ ...payload, amount: pageSize, offset: (payload.page - 1) * pageSize })),
 
       concatMap(({ masterSKU, amount, sorting, offset, page }) =>
-        this.productsService.getProductsForMaster(masterSKU, amount, sorting, offset).pipe(
-          concatMap(({ total, products, sortableAttributes }) => [
-            ...products.map(product => loadProductSuccess({ product })),
-            setProductListingPages(
-              this.productListingMapper.createPages(
-                products.map(p => p.sku),
-                'master',
-                masterSKU,
-                amount,
-                {
-                  startPage: page,
-                  sortableAttributes,
-                  sorting,
-                  itemCount: total,
-                }
-              )
-            ),
-          ]),
-          mapErrorToAction(loadProductsForMasterFail, { masterSKU })
-        )
+        this.serviceSelect
+          .get('products')
+          .getProductsForMaster(masterSKU, amount, sorting, offset)
+          .pipe(
+            concatMap(({ total, products, sortableAttributes }) => [
+              ...products.map(product => loadProductSuccess({ product })),
+              setProductListingPages(
+                this.productListingMapper.createPages(
+                  products.map(p => p.sku),
+                  'master',
+                  masterSKU,
+                  amount,
+                  {
+                    startPage: page,
+                    sortableAttributes,
+                    sorting,
+                    itemCount: total,
+                  }
+                )
+              ),
+            ]),
+            mapErrorToAction(loadProductsForMasterFail, { masterSKU })
+          )
       )
     )
   );
@@ -188,7 +197,8 @@ export class ProductsEffects {
           whenTruthy(),
           first(),
           switchMap(pageSize =>
-            this.productsService
+            this.serviceSelect
+              .get('products')
               .getFilteredProducts(searchParameter, pageSize, sorting, ((page || 1) - 1) * pageSize)
               .pipe(
                 mergeMap(({ products, total, sortableAttributes }) => [
@@ -237,23 +247,29 @@ export class ProductsEffects {
           ),
           exhaustMap(product =>
             ProductHelper.isProductBundle(product)
-              ? this.productsService.getProductBundles(product.sku).pipe(
-                  mergeMap(({ stubs, bundledProducts: parts }) => [
-                    ...stubs.map((stub: Product) => loadProductSuccess({ product: stub })),
-                    loadProductPartsSuccess({ sku: product.sku, parts }),
-                  ]),
-                  mapErrorToAction(loadProductFail, { sku: product.sku })
-                )
-              : this.productsService.getRetailSetParts(product.sku).pipe(
-                  mergeMap(stubs => [
-                    ...stubs.map((stub: Product) => loadProductSuccess({ product: stub })),
-                    loadProductPartsSuccess({
-                      sku: product.sku,
-                      parts: stubs.map(stub => ({ sku: stub.sku, quantity: 1 })),
-                    }),
-                  ]),
-                  mapErrorToAction(loadProductFail, { sku: product.sku })
-                )
+              ? this.serviceSelect
+                  .get('products')
+                  .getProductBundles(product.sku)
+                  .pipe(
+                    mergeMap(({ stubs, bundledProducts: parts }) => [
+                      ...stubs.map((stub: Product) => loadProductSuccess({ product: stub })),
+                      loadProductPartsSuccess({ sku: product.sku, parts }),
+                    ]),
+                    mapErrorToAction(loadProductFail, { sku: product.sku })
+                  )
+              : this.serviceSelect
+                  .get('products')
+                  .getRetailSetParts(product.sku)
+                  .pipe(
+                    mergeMap(stubs => [
+                      ...stubs.map((stub: Product) => loadProductSuccess({ product: stub })),
+                      loadProductPartsSuccess({
+                        sku: product.sku,
+                        parts: stubs.map(stub => ({ sku: stub.sku, quantity: 1 })),
+                      }),
+                    ]),
+                    mapErrorToAction(loadProductFail, { sku: product.sku })
+                  )
           )
         )
       )
@@ -280,18 +296,21 @@ export class ProductsEffects {
             )
           ),
           exhaustMap(sku =>
-            this.productsService.getProductVariations(sku).pipe(
-              mergeMap(({ products: variations, defaultVariation, masterProduct }) => [
-                ...variations.map(product => loadProductSuccess({ product })),
-                loadProductSuccess({ product: masterProduct }),
-                loadProductVariationsSuccess({
-                  sku,
-                  variations: variations.map(p => p.sku),
-                  defaultVariation,
-                }),
-              ]),
-              mapErrorToAction(loadProductVariationsFail, { sku })
-            )
+            this.serviceSelect
+              .get('products')
+              .getProductVariations(sku)
+              .pipe(
+                mergeMap(({ products: variations, defaultVariation, masterProduct }) => [
+                  ...variations.map(product => loadProductSuccess({ product })),
+                  loadProductSuccess({ product: masterProduct }),
+                  loadProductVariationsSuccess({
+                    sku,
+                    variations: variations.map(p => p.sku),
+                    defaultVariation,
+                  }),
+                ]),
+                mapErrorToAction(loadProductVariationsFail, { sku })
+              )
           )
         )
       )
@@ -360,10 +379,13 @@ export class ProductsEffects {
       mapToPayloadProperty('sku'),
       distinct(),
       mergeMap(sku =>
-        this.productsService.getProductLinks(sku).pipe(
-          map(links => loadProductLinksSuccess({ sku, links })),
-          mapErrorToAction(loadProductLinksFail, { sku })
-        )
+        this.serviceSelect
+          .get('products')
+          .getProductLinks(sku)
+          .pipe(
+            map(links => loadProductLinksSuccess({ sku, links })),
+            mapErrorToAction(loadProductLinksFail, { sku })
+          )
       )
     )
   );

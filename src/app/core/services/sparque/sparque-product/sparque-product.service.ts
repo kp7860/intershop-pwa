@@ -14,7 +14,7 @@ export class SparqueProductService extends BaseProductsService {
   searchProducts(
     searchTerm: string,
     amount: number,
-    sortKey?: string,
+    _sortKey?: string,
     offset?: number
   ): Observable<{ products: Product[]; sortableAttributes: SortableAttributesType[]; total: number }> {
     // TODO Sparque API should provide all necessary product information
