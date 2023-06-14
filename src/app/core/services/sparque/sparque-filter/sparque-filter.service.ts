@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, forkJoin, map, switchMap } from 'rxjs';
 
 import { FilterNavigation } from 'ish-core/models/filter-navigation/filter-navigation.model';
@@ -13,8 +13,8 @@ import { DEFINED_FACETS, SparqueApiService } from 'ish-core/services/sparque/spa
 import { URLFormParams } from 'ish-core/utils/url-form-params';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueFilterService implements Partial<BaseFilterService> {
-  constructor(private sparqueApiService: SparqueApiService) {}
+export class SparqueFilterService extends BaseFilterService {
+  private sparqueApiService = inject(SparqueApiService);
 
   getFilterForSearch(searchTerm: string): Observable<FilterNavigation> {
     return this.sparqueApiService

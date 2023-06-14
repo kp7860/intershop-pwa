@@ -1,14 +1,41 @@
-import { Injectable } from '@angular/core';
-import { Observable, map, switchMap, throwError } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { Observable, catchError, forkJoin, iif, map, of, switchMap, throwError } from 'rxjs';
 
 import { SortableAttributesType } from 'ish-core/models/product-listing/product-listing.model';
+import { Product } from 'ish-core/models/product/product.model';
 import { SparqueCountResponse, SparqueFacetOptionsResponse } from 'ish-core/models/sparque/sparque.interface';
+import { BaseProductsService } from 'ish-core/services/products/products.service';
 import { SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueProductService {
-  constructor(private sparqueApiService: SparqueApiService) {}
-  searchProductKeys(
+export class SparqueProductService extends BaseProductsService {
+  private sparqueApiService = inject(SparqueApiService);
+
+  searchProducts(
+    searchTerm: string,
+    amount: number,
+    sortKey?: string,
+    offset?: number
+  ): Observable<{ products: Product[]; sortableAttributes: SortableAttributesType[]; total: number }> {
+    // TODO Sparque API should provide all necessary product information
+    return this.searchProductKeys(searchTerm, amount, offset).pipe(
+      switchMap(({ skus, sortableAttributes, total }) =>
+        iif(
+          () => !!total,
+          forkJoin(skus.map(sku => this.getProduct(sku).pipe(catchError(() => of(undefined))))),
+          of([])
+        ).pipe(
+          map(products => ({
+            products: products.filter(p => !!p),
+            sortableAttributes,
+            total,
+          }))
+        )
+      )
+    );
+  }
+
+  private searchProductKeys(
     searchTerm: string,
     amount: number,
     offset?: number

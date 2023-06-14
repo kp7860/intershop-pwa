@@ -1,5 +1,5 @@
 import { HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -11,15 +11,9 @@ import { ApiService } from 'ish-core/services/api/api.service';
 import { omit } from 'ish-core/utils/functions';
 import { URLFormParams, appendFormParamsToHttpParams } from 'ish-core/utils/url-form-params';
 
-export interface BaseFilterService {
-  getFilterForCategory(categoryUniqueId: string): Observable<FilterNavigation>;
-  getFilterForSearch(searchTerm: string): Observable<FilterNavigation>;
-  getFilterForMaster(masterSKU: string): Observable<FilterNavigation>;
-  applyFilter(searchParameter: URLFormParams): Observable<FilterNavigation>;
-}
-@Injectable({ providedIn: 'root' })
-export class FilterService implements BaseFilterService {
-  constructor(private apiService: ApiService, private filterNavigationMapper: FilterNavigationMapper) {}
+export abstract class BaseFilterService {
+  private apiService = inject(ApiService);
+  private filterNavigationMapper = inject(FilterNavigationMapper);
 
   getFilterForCategory(categoryUniqueId: string): Observable<FilterNavigation> {
     const category = CategoryHelper.getCategoryPath(categoryUniqueId);
@@ -58,3 +52,5 @@ export class FilterService implements BaseFilterService {
       .pipe(map(filter => this.filterNavigationMapper.fromData(filter)));
   }
 }
+@Injectable({ providedIn: 'root' })
+export class FilterService extends BaseFilterService {}

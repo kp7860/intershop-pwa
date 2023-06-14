@@ -4,7 +4,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { routerNavigatedAction } from '@ngrx/router-store';
 import { Store, select } from '@ngrx/store';
 import { TranslateService } from '@ngx-translate/core';
-import { EMPTY, forkJoin, from, iif, of } from 'rxjs';
+import { EMPTY, from } from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -17,13 +17,8 @@ import {
   withLatestFrom,
 } from 'rxjs/operators';
 
-import { FeatureToggleService } from 'ish-core/feature-toggle.module';
 import { ProductListingMapper } from 'ish-core/models/product-listing/product-listing.mapper';
 import { generateProductUrl } from 'ish-core/routing/product/product.route';
-import { ProductsService } from 'ish-core/services/products/products.service';
-import { SparqueProductService } from 'ish-core/services/sparque/sparque-product/sparque-product.service';
-import { SparqueSuggestService } from 'ish-core/services/sparque/sparque-suggest/sparque-suggest.service';
-import { SuggestService } from 'ish-core/services/suggest/suggest.service';
 import { ofUrl, selectRouteParam } from 'ish-core/store/core/router';
 import { setBreadcrumbData } from 'ish-core/store/core/viewconf';
 import { personalizationStatusDetermined } from 'ish-core/store/customer/user';
@@ -41,6 +36,7 @@ import {
   useCombinedObservableOnAction,
   whenTruthy,
 } from 'ish-core/utils/operators';
+import { ServiceSelectService } from 'ish-core/utils/service-select/service-select.service';
 
 import { searchProducts, searchProductsFail, suggestSearch, suggestSearchSuccess } from './search.actions';
 
@@ -49,15 +45,11 @@ export class SearchEffects {
   constructor(
     private actions$: Actions,
     private store: Store,
-    private productsService: ProductsService,
-    private suggestService: SuggestService,
     private httpStatusCodeService: HttpStatusCodeService,
     private productListingMapper: ProductListingMapper,
     private translateService: TranslateService,
     private router: Router,
-    private featureToggle: FeatureToggleService,
-    private sparqueSuggestionService: SparqueSuggestService,
-    private sparqueProductService: SparqueProductService
+    private serviceSelect: ServiceSelectService
   ) {}
 
   /**
@@ -89,52 +81,36 @@ export class SearchEffects {
       withLatestFrom(this.store.pipe(select(getProductListingItemsPerPage('search')))),
       map(([payload, pageSize]) => ({ ...payload, amount: pageSize, offset: (payload.page - 1) * pageSize })),
       concatMap(({ searchTerm, amount, sorting, offset, page }) =>
-        iif(
-          () => this.featureToggle.enabled('sparque'),
-          // TODO Sparque API should provide all necessary product information
-          this.sparqueProductService.searchProductKeys(searchTerm, amount, offset).pipe(
-            switchMap(({ skus, sortableAttributes, total }) =>
-              iif(
-                () => !!total,
-                forkJoin(skus.map(sku => this.productsService.getProduct(sku).pipe(catchError(() => of(undefined))))),
-                of([])
-              ).pipe(
-                map(products => ({
-                  products: products.filter(p => !!p),
-                  sortableAttributes,
-                  total,
-                }))
-              )
-            )
-          ),
-          this.productsService.searchProducts(searchTerm, amount, sorting, offset)
-        ).pipe(
-          concatMap(({ total, products, sortableAttributes }) => {
-            // route to product detail page if only one product was found
-            if (total === 1) {
-              this.router.navigate([generateProductUrl(products[0])]);
-            }
-            // provide the data for the search result page
-            return [
-              ...products.map(product => loadProductSuccess({ product })),
-              setProductListingPages(
-                this.productListingMapper.createPages(
-                  products.map(p => p.sku),
-                  'search',
-                  searchTerm,
-                  amount,
-                  {
-                    startPage: page,
-                    sorting,
-                    sortableAttributes,
-                    itemCount: total,
-                  }
-                )
-              ),
-            ];
-          }),
-          mapErrorToAction(searchProductsFail)
-        )
+        this.serviceSelect
+          .get('products')
+          .searchProducts(searchTerm, amount, sorting, offset)
+          .pipe(
+            concatMap(({ total, products, sortableAttributes }) => {
+              // route to product detail page if only one product was found
+              if (total === 1) {
+                this.router.navigate([generateProductUrl(products[0])]);
+              }
+              // provide the data for the search result page
+              return [
+                ...products.map(product => loadProductSuccess({ product })),
+                setProductListingPages(
+                  this.productListingMapper.createPages(
+                    products.map(p => p.sku),
+                    'search',
+                    searchTerm,
+                    amount,
+                    {
+                      startPage: page,
+                      sorting,
+                      sortableAttributes,
+                      itemCount: total,
+                    }
+                  )
+                ),
+              ];
+            }),
+            mapErrorToAction(searchProductsFail)
+          )
       )
     )
   );
@@ -148,14 +124,13 @@ export class SearchEffects {
       distinctUntilChanged(),
       whenTruthy(),
       switchMap(searchTerm =>
-        iif(
-          () => this.featureToggle.enabled('sparque'),
-          this.sparqueSuggestionService.search(searchTerm),
-          this.suggestService.search(searchTerm)
-        ).pipe(
-          map(suggests => suggestSearchSuccess({ searchTerm, suggests })),
-          catchError(() => EMPTY)
-        )
+        this.serviceSelect
+          .get('suggest')
+          .search(searchTerm)
+          .pipe(
+            map(suggests => suggestSearchSuccess({ searchTerm, suggests })),
+            catchError(() => EMPTY)
+          )
       )
     )
   );

@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -7,8 +7,9 @@ import { SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque
 import { BaseSuggestService } from 'ish-core/services/suggest/suggest.service';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueSuggestService implements Partial<BaseSuggestService> {
-  constructor(private sparqueApiService: SparqueApiService) {}
+export class SparqueSuggestService extends BaseSuggestService {
+  private sparqueApiService = inject(SparqueApiService);
+
   search(searchTerm: string): Observable<SuggestTerm[]> {
     return this.sparqueApiService
       .get(`e/keywordsuggest/p/keyword/${searchTerm}/results`)
