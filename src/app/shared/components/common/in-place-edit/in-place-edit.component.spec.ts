@@ -59,8 +59,10 @@ describe('In Place Edit Component', () => {
       <ish-in-place-edit
         ><div class="d-flex flex-row align-items-baseline" title="inplace_edit.click_to_edit">
           <p class="form-control-plaintext">VIEW</p>
-        </div></ish-in-place-edit
-      >
+          <button class="btn btn-link">
+            <fa-icon class="pl-2 mr-auto btn-link" ng-reflect-icon="fas,pencil-alt"></fa-icon>
+          </button></div
+      ></ish-in-place-edit>
     `);
   });
 
@@ -101,8 +103,10 @@ describe('In Place Edit Component', () => {
         <ish-in-place-edit
           ><div class="d-flex flex-row align-items-baseline" title="inplace_edit.click_to_edit">
             <p class="form-control-plaintext">VIEW</p>
-          </div></ish-in-place-edit
-        >
+            <button class="btn btn-link">
+              <fa-icon class="pl-2 mr-auto btn-link" ng-reflect-icon="fas,pencil-alt"></fa-icon>
+            </button></div
+        ></ish-in-place-edit>
       `);
     });
 
@@ -123,8 +127,10 @@ describe('In Place Edit Component', () => {
         <ish-in-place-edit
           ><div class="d-flex flex-row align-items-baseline" title="inplace_edit.click_to_edit">
             <p class="form-control-plaintext">VIEW</p>
-          </div></ish-in-place-edit
-        >
+            <button class="btn btn-link">
+              <fa-icon class="pl-2 mr-auto btn-link" ng-reflect-icon="fas,pencil-alt"></fa-icon>
+            </button></div
+        ></ish-in-place-edit>
       `);
     });
 
@@ -145,8 +151,10 @@ describe('In Place Edit Component', () => {
         <ish-in-place-edit
           ><div class="d-flex flex-row align-items-baseline" title="inplace_edit.click_to_edit">
             <p class="form-control-plaintext">VIEW</p>
-          </div></ish-in-place-edit
-        >
+            <button class="btn btn-link">
+              <fa-icon class="pl-2 mr-auto btn-link" ng-reflect-icon="fas,pencil-alt"></fa-icon>
+            </button></div
+        ></ish-in-place-edit>
       `);
     });
 
