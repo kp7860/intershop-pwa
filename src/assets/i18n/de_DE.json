@@ -635,7 +635,7 @@
   "checkout.address.delete.confirmation.text": "Wollen Sie diese Adresse wirklich löschen?",
   "checkout.address.shipping.label": "Lieferadresse",
   "checkout.address.update.button.label": "Diese Adresse bearbeiten",
-  "checkout.address.update.label": "Bearbeiten",
+  "checkout.address.update.label": "{{0}} bearbeiten",
   "checkout.addresses.billing_address.heading": "Rechnungsadresse",
   "checkout.addresses.checkout_as_guest.heading": "Als Gast kaufen",
   "checkout.addresses.email.label": "E-Mail-Adresse",
