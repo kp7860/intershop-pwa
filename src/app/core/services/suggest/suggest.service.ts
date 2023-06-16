@@ -1,12 +1,16 @@
 import { HttpParams } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { SuggestTerm } from 'ish-core/models/suggest-term/suggest-term.model';
 import { ApiService, unpackEnvelope } from 'ish-core/services/api/api.service';
 
-export abstract class BaseSuggestService {
-  private apiService = inject(ApiService);
+/**
+ * The Suggest Service handles the interaction with the 'suggest' REST API.
+ */
+@Injectable({ providedIn: 'root' })
+export class SuggestService {
+  constructor(private apiService: ApiService) {}
 
   /**
    * Returns a list of suggested search terms matching the given search term.
@@ -19,9 +23,3 @@ export abstract class BaseSuggestService {
     return this.apiService.get('suggest', { params }).pipe(unpackEnvelope<SuggestTerm>());
   }
 }
-
-/**
- * The Suggest Service handles the interaction with the 'suggest' REST API.
- */
-@Injectable({ providedIn: 'root' })
-export class SuggestService extends BaseSuggestService {}

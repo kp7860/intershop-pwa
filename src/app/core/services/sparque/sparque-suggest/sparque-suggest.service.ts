@@ -4,10 +4,10 @@ import { map } from 'rxjs/operators';
 
 import { SuggestTerm } from 'ish-core/models/suggest-term/suggest-term.model';
 import { SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
-import { BaseSuggestService } from 'ish-core/services/suggest/suggest.service';
+import { SuggestService } from 'ish-core/services/suggest/suggest.service';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueSuggestService extends BaseSuggestService {
+export class SparqueSuggestService extends SuggestService {
   private sparqueApiService = inject(SparqueApiService);
 
   search(searchTerm: string): Observable<SuggestTerm[]> {

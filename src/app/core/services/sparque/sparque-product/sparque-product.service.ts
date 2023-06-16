@@ -4,11 +4,11 @@ import { Observable, catchError, forkJoin, iif, map, of, switchMap, throwError }
 import { SortableAttributesType } from 'ish-core/models/product-listing/product-listing.model';
 import { Product } from 'ish-core/models/product/product.model';
 import { SparqueCountResponse, SparqueFacetOptionsResponse } from 'ish-core/models/sparque/sparque.interface';
-import { BaseProductsService } from 'ish-core/services/products/products.service';
+import { ProductsService } from 'ish-core/services/products/products.service';
 import { SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueProductService extends BaseProductsService {
+export class SparqueProductService extends ProductsService {
   private sparqueApiService = inject(SparqueApiService);
 
   searchProducts(

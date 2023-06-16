@@ -8,12 +8,12 @@ import {
   SparqueFacetResponse,
   SparqueOptionsResponse,
 } from 'ish-core/models/sparque/sparque.interface';
-import { BaseFilterService } from 'ish-core/services/filter/filter.service';
+import { FilterService } from 'ish-core/services/filter/filter.service';
 import { DEFINED_FACETS, SparqueApiService } from 'ish-core/services/sparque/sparque-api/sparque-api.service';
 import { URLFormParams } from 'ish-core/utils/url-form-params';
 
 @Injectable({ providedIn: 'root' })
-export class SparqueFilterService extends BaseFilterService {
+export class SparqueFilterService extends FilterService {
   private sparqueApiService = inject(SparqueApiService);
 
   getFilterForSearch(searchTerm: string): Observable<FilterNavigation> {
