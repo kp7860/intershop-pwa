@@ -68,7 +68,7 @@ services:
       CACHE: 0
       # SSL: 1
       # SSR: 0
-      # DEBUG: 1
+      DEBUG: 1
       # PROMETHEUS: 1
       # COMPRESSION: 0
       # DEVICE_DETECTION: 0
