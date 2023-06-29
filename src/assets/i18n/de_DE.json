@@ -875,6 +875,7 @@
   "helpdesk.mail_not_sent.message": "Ihre E-Mail konnte leider nicht versandt werden. Wir bitten um Entschuldigung.",
   "helpdesk.try_again.message": "Bitte versuchen Sie es später erneut.",
   "helpdesk.user_service.message": "Um unseren Benutzerservice per Telefon zu kontaktieren, wählen Sie <strong>0-800-xxx-xxxx</strong>.",
+  "image.alt_text.default": "Alternativtext wird nicht gepflegt.",
   "inplace_edit.cancel": "Abbrechen",
   "inplace_edit.click_to_edit": "Klicken zum Editieren",
   "inplace_edit.save": "Speichern",
