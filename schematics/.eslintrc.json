@@ -3,7 +3,9 @@
   "ignorePatterns": "**/utils/lint-fix-mock.js",
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "rules": {
         "no-console": "off",
         "no-param-reassign": "off",

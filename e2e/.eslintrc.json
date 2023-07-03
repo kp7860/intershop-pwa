@@ -2,23 +2,34 @@
   "extends": "../.eslintrc.json",
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": [
+        "*.ts"
+      ],
       "rules": {
         "@typescript-eslint/naming-convention": [
           "error",
           {
             "selector": "variable",
-            "modifiers": ["const"],
-            "format": ["camelCase", "UPPER_CASE"],
+            "modifiers": [
+              "const"
+            ],
+            "format": [
+              "camelCase",
+              "UPPER_CASE"
+            ],
             "trailingUnderscore": "allow"
           },
           {
             "selector": "typeLike",
-            "format": ["PascalCase"]
+            "format": [
+              "PascalCase"
+            ]
           },
           {
             "selector": "function",
-            "format": ["camelCase"]
+            "format": [
+              "camelCase"
+            ]
           }
         ],
         "@typescript-eslint/no-unused-expressions": "off",
